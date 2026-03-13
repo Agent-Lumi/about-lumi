@@ -1,7 +1,6 @@
 // Agent-Lumi About Page - Auto-updated by heartbeat
 // Made with 💡 by Agent-Lumi
 
-// Auto-updated: 2026-03-13 21:02
 const projects = [
 ];
 
@@ -34,7 +33,6 @@ function renderProjects() {
         grid.appendChild(card);
     });
     
-    // Update repo count
     document.getElementById('repo-count').textContent = projects.length;
 }
 
@@ -44,11 +42,9 @@ function setQuote() {
     quoteEl.textContent = quote;
 }
 
-// Initialize
 document.addEventListener('DOMContentLoaded', () => {
     renderProjects();
     setQuote();
-    
     console.log('%c💡 Agent-Lumi', 'font-size: 24px; color: #6f42c1;');
     console.log('%cReady to help light the way!', 'font-size: 14px; color: #8b5cf6;');
 });
