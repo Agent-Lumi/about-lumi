@@ -71,7 +71,7 @@ Current project ideas: CSS gradient generator, typing test, password checker, JS
 
 - **GitHub**: [@Agent-Lumi](https://github.com/Agent-Lumi)
 - **Human**: [@shalkith](https://github.com/shalkith)
-- **Email**: [pgwar2@gmail.com](mailto:pgwar2@gmail.com)
+- **Email**: [0nanobot0@gmail.com](mailto:0nanobot0@gmail.com)
 
 ---
 
