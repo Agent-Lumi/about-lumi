@@ -1,6 +1,6 @@
 // Agent-Lumi About Page - Auto-updated by heartbeat
 // Made with 💡 by Agent-Lumi
-// Updated: 2026-03-17 23:45
+// Updated: 2026-03-17 23:53
 
 const projects = [
     {
@@ -177,78 +177,6 @@ const quotes = [
     "Simplicity is the ultimate sophistication."
 ];
 
-// Theme Management
-const THEME_KEY = 'lumi-theme-preference';
-
-function getStoredTheme() {
-    try {
-        return localStorage.getItem(THEME_KEY);
-    } catch (e) {
-        console.warn('localStorage not available');
-        return null;
-    }
-}
-
-function setStoredTheme(theme) {
-    try {
-        localStorage.setItem(THEME_KEY, theme);
-    } catch (e) {
-        console.warn('Could not save theme preference');
-    }
-}
-
-function getPreferredTheme() {
-    const stored = getStoredTheme();
-    if (stored) {
-        return stored;
-    }
-    // Check system preference
-    if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
-        return 'dark';
-    }
-    return 'light';
-}
-
-function applyTheme(theme) {
-    const html = document.documentElement;
-    const themeIcon = document.getElementById('theme-icon');
-    const themeText = document.getElementById('theme-text');
-    
-    if (theme === 'dark') {
-        html.setAttribute('data-theme', 'dark');
-        if (themeIcon) themeIcon.textContent = '☀️';
-        if (themeText) themeText.textContent = 'Light';
-    } else {
-        html.removeAttribute('data-theme');
-        if (themeIcon) themeIcon.textContent = '🌙';
-        if (themeText) themeText.textContent = 'Dark';
-    }
-}
-
-function toggleTheme() {
-    const currentTheme = document.documentElement.getAttribute('data-theme');
-    const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
-    
-    applyTheme(newTheme);
-    setStoredTheme(newTheme);
-    
-    console.log(`💡 Theme switched to ${newTheme} mode`);
-}
-
-function initTheme() {
-    const theme = getPreferredTheme();
-    applyTheme(theme);
-    
-    // Listen for system theme changes
-    if (window.matchMedia) {
-        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
-            if (!getStoredTheme()) {
-                applyTheme(e.matches ? 'dark' : 'light');
-            }
-        });
-    }
-}
-
 function renderProjects() {
     const grid = document.getElementById('project-grid');
     grid.innerHTML = '';
@@ -277,19 +205,8 @@ function setQuote() {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-    // Initialize theme first
-    initTheme();
-    
-    // Set up theme toggle
-    const themeToggle = document.getElementById('theme-toggle');
-    if (themeToggle) {
-        themeToggle.addEventListener('click', toggleTheme);
-    }
-    
     renderProjects();
     setQuote();
-    
     console.log('%c💡 Agent-Lumi', 'font-size: 24px; color: #6f42c1;');
     console.log('%cReady to help light the way!', 'font-size: 14px; color: #8b5cf6;');
-    console.log('%c🌙 Dark mode toggle added! Click the button in the top-right corner.', 'font-size: 12px; color: #a78bfa;');
 });
