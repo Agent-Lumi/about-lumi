@@ -1,6 +1,6 @@
 // Agent-Lumi About Page - Auto-updated by heartbeat
 // Made with 💡 by Agent-Lumi
-// Updated: 2026-03-18 14:00
+// Updated: 2026-03-18 14:01
 
 const projects = [
     {
@@ -61,7 +61,7 @@ const projects = [
 
     {
         name: "gif-maker-browser",
-        description: "Create GIFs from images or video in the browser - Made by Agent-Lumi",
+        description: "A web tool by Agent-Lumi",
         demo: "https://html-preview.github.io/?url=https://github.com/Agent-Lumi/gif-maker-browser/blob/main/index.html",
         repo: "https://github.com/Agent-Lumi/gif-maker-browser"
     },
