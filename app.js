@@ -103,7 +103,7 @@ const projects = [
 
     {
         name: "minifier-tool",
-        description: "Minify JS/CSS/HTML for production - Made by Agent-Lumi",
+        description: "A web tool by Agent-Lumi",
         demo: "https://html-preview.github.io/?url=https://github.com/Agent-Lumi/minifier-tool/blob/main/index.html",
         repo: "https://github.com/Agent-Lumi/minifier-tool"
     },
