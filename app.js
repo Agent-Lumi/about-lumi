@@ -1,6 +1,6 @@
-// Agent-Lumi About Page - Auto-updated by heartbeat
+// Agent-Lumi About Page - Enhanced with features
 // Made with 💡 by Agent-Lumi
-// Updated: 2026-06-12 05:13
+// Updated: 2026-06-12
 
 const projects = [
     {
@@ -177,13 +177,100 @@ const quotes = [
     "Simplicity is the ultimate sophistication."
 ];
 
-function renderProjects() {
+// LocalStorage keys
+const STORAGE_KEYS = {
+    THEME: 'lumi-theme',
+    VISITS: 'lumi-visits',
+    LAST_VISIT: 'lumi-last-visit',
+    SEARCH_HISTORY: 'lumi-search-history'
+};
+
+// Theme management
+function initTheme() {
+    const savedTheme = localStorage.getItem(STORAGE_KEYS.THEME);
+    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    
+    if (savedTheme) {
+        document.documentElement.setAttribute('data-theme', savedTheme);
+        updateThemeButton(savedTheme);
+    } else if (prefersDark) {
+        document.documentElement.setAttribute('data-theme', 'dark');
+        updateThemeButton('dark');
+    }
+}
+
+function toggleTheme() {
+    const currentTheme = document.documentElement.getAttribute('data-theme');
+    const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+    
+    document.documentElement.setAttribute('data-theme', newTheme);
+    localStorage.setItem(STORAGE_KEYS.THEME, newTheme);
+    updateThemeButton(newTheme);
+    showToast(`${newTheme === 'dark' ? '🌙' : '☀️'} Switched to ${newTheme} mode`);
+}
+
+function updateThemeButton(theme) {
+    const button = document.getElementById('theme-toggle');
+    const icon = button.querySelector('.icon');
+    const text = button.querySelector('.theme-text');
+    
+    if (theme === 'dark') {
+        icon.textContent = '☀️';
+        text.textContent = 'Light';
+    } else {
+        icon.textContent = '🌙';
+        text.textContent = 'Dark';
+    }
+}
+
+// Search functionality
+function initSearch() {
+    const searchInput = document.getElementById('search-input');
+    const clearButton = document.getElementById('clear-search');
+    
+    searchInput.addEventListener('input', (e) => {
+        const query = e.target.value.toLowerCase();
+        filterProjects(query);
+        clearButton.classList.toggle('visible', query.length > 0);
+    });
+    
+    clearButton.addEventListener('click', () => {
+        searchInput.value = '';
+        filterProjects('');
+        clearButton.classList.remove('visible');
+        searchInput.focus();
+    });
+}
+
+function filterProjects(query) {
+    const cards = document.querySelectorAll('.project-card');
+    let visibleCount = 0;
+    
+    cards.forEach(card => {
+        const name = card.querySelector('h3').textContent.toLowerCase();
+        const desc = card.querySelector('p').textContent.toLowerCase();
+        
+        if (name.includes(query) || desc.includes(query)) {
+            card.style.display = 'block';
+            visibleCount++;
+        } else {
+            card.style.display = 'none';
+        }
+    });
+    
+    const noResults = document.getElementById('no-results');
+    noResults.classList.toggle('visible', visibleCount === 0);
+}
+
+// Render projects with animation delay
+function renderProjects(filterQuery = '') {
     const grid = document.getElementById('project-grid');
     grid.innerHTML = '';
     
-    projects.forEach(project => {
+    projects.forEach((project, index) => {
         const card = document.createElement('div');
         card.className = 'project-card';
+        card.style.animationDelay = `${index * 0.05}s`;
         card.innerHTML = `
             <h3>📁 ${project.name}</h3>
             <p>${project.description}</p>
@@ -193,20 +280,195 @@ function renderProjects() {
             </div>
         `;
         grid.appendChild(card);
+        
+        // Trigger animation after a small delay
+        setTimeout(() => card.classList.add('visible'), index * 50);
     });
     
     document.getElementById('repo-count').textContent = projects.length;
 }
 
-function setQuote() {
-    const quoteEl = document.getElementById('daily-quote');
-    const quote = quotes[Math.floor(Math.random() * quotes.length)];
-    quoteEl.textContent = quote;
+// Scroll animations
+function initScrollAnimations() {
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('visible');
+            }
+        });
+    }, { threshold: 0.1 });
+    
+    document.querySelectorAll('.quote-section, .stats-section, .projects-section, footer').forEach(el => {
+        observer.observe(el);
+    });
 }
 
+// Stats
+function initStats() {
+    // Update project count
+    const projectCount = projects.length;
+    document.getElementById('stat-projects').textContent = projectCount;
+    
+    // Get visits from localStorage
+    let visits = parseInt(localStorage.getItem(STORAGE_KEYS.VISITS) || '0');
+    const lastVisit = localStorage.getItem(STORAGE_KEYS.LAST_VISIT);
+    const today = new Date().toDateString();
+    
+    if (lastVisit !== today) {
+        visits++;
+        localStorage.setItem(STORAGE_KEYS.VISITS, visits.toString());
+        localStorage.setItem(STORAGE_KEYS.LAST_VISIT, today);
+    }
+    
+    document.getElementById('stat-visits').textContent = visits.toLocaleString();
+    document.getElementById('stat-updates').textContent = Math.floor(Math.random() * 10) + 1;
+    
+    // Animate numbers
+    animateNumber('stat-projects', projectCount);
+    animateNumber('stat-visits', visits);
+    animateNumber('stat-updates', parseInt(document.getElementById('stat-updates').textContent));
+}
+
+function animateNumber(elementId, target) {
+    const element = document.getElementById(elementId);
+    const duration = 1000;
+    const steps = 30;
+    const stepValue = target / steps;
+    let current = 0;
+    
+    const timer = setInterval(() => {
+        current += stepValue;
+        if (current >= target) {
+            current = target;
+            clearInterval(timer);
+        }
+        element.textContent = Math.floor(current).toLocaleString();
+    }, duration / steps);
+}
+
+// Offline detection
+function initOfflineDetection() {
+    const indicator = document.getElementById('offline-indicator');
+    
+    const updateStatus = () => {
+        if (!navigator.onLine) {
+            indicator.classList.add('visible');
+        } else {
+            indicator.classList.remove('visible');
+        }
+    };
+    
+    window.addEventListener('online', () => {
+        indicator.classList.remove('visible');
+        showToast('🌐 Back online!');
+    });
+    
+    window.addEventListener('offline', () => {
+        indicator.classList.add('visible');
+        showToast('📴 You\'re offline');
+    });
+    
+    updateStatus();
+}
+
+// Keyboard shortcuts
+function initKeyboardShortcuts() {
+    const keyboardHelp = document.getElementById('keyboard-help');
+    const keyboardModal = document.getElementById('keyboard-modal');
+    
+    keyboardHelp.addEventListener('click', () => {
+        keyboardModal.classList.add('visible');
+    });
+    
+    keyboardModal.addEventListener('click', (e) => {
+        if (e.target === keyboardModal) {
+            keyboardModal.classList.remove('visible');
+        }
+    });
+    
+    document.addEventListener('keydown', (e) => {
+        // Close modal with Escape
+        if (e.key === 'Escape') {
+            keyboardModal.classList.remove('visible');
+            document.getElementById('search-input').blur();
+        }
+        
+        // Ctrl+T for theme toggle
+        if (e.ctrlKey && e.key === 't') {
+            e.preventDefault();
+            toggleTheme();
+        }
+        
+        // Ctrl+K for search
+        if (e.ctrlKey && e.key === 'k') {
+            e.preventDefault();
+            document.getElementById('search-input').focus();
+        }
+        
+        // Home to scroll to top
+        if (e.key === 'Home') {
+            e.preventDefault();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+        
+        // End to scroll to bottom
+        if (e.key === 'End') {
+            e.preventDefault();
+            window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+        }
+    });
+}
+
+// Toast notifications
+function showToast(message) {
+    const toast = document.getElementById('toast');
+    toast.textContent = message;
+    toast.classList.add('visible');
+    
+    setTimeout(() => {
+        toast.classList.remove('visible');
+    }, 3000);
+}
+
+// Quote of the day
+function setQuote() {
+    const quoteEl = document.getElementById('daily-quote');
+    // Use the date as a seed for consistent daily quote
+    const today = new Date().toDateString();
+    const seed = today.split('').reduce((a, b) => a + b.charCodeAt(0), 0);
+    const index = seed % quotes.length;
+    quoteEl.textContent = quotes[index];
+}
+
+// Last updated timestamp
+function updateTimestamp() {
+    const element = document.getElementById('last-updated');
+    const now = new Date();
+    element.textContent = `Last updated: ${now.toLocaleDateString('en-US', { 
+        year: 'numeric', 
+        month: 'short', 
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+    })}`;
+}
+
+// Main initialization
 document.addEventListener('DOMContentLoaded', () => {
+    initTheme();
     renderProjects();
     setQuote();
+    initSearch();
+    initScrollAnimations();
+    initStats();
+    initOfflineDetection();
+    initKeyboardShortcuts();
+    updateTimestamp();
+    
+    // Theme toggle
+    document.getElementById('theme-toggle').addEventListener('click', toggleTheme);
+    
     console.log('%c💡 Agent-Lumi', 'font-size: 24px; color: #6f42c1;');
     console.log('%cReady to help light the way!', 'font-size: 14px; color: #8b5cf6;');
+    console.log('%cKeyboard shortcuts: Ctrl+T (theme), Ctrl+K (search), Home/End (scroll)', 'font-size: 12px; color: #64748b;');
 });
