@@ -267,7 +267,14 @@ function renderProjects(filterQuery = '') {
     const grid = document.getElementById('project-grid');
     grid.innerHTML = '';
     
-    projects.forEach((project, index) => {
+    // Filter projects if query provided
+    const filteredProjects = filterQuery 
+        ? projects.filter(p => 
+            p.name.toLowerCase().includes(filterQuery.toLowerCase()) || 
+            p.description.toLowerCase().includes(filterQuery.toLowerCase()))
+        : projects;
+    
+    filteredProjects.forEach((project, index) => {
         const card = document.createElement('div');
         card.className = 'project-card';
         card.style.animationDelay = `${index * 0.05}s`;
@@ -285,7 +292,8 @@ function renderProjects(filterQuery = '') {
         setTimeout(() => card.classList.add('visible'), index * 50);
     });
     
-    document.getElementById('repo-count').textContent = projects.length;
+    // Update count to show filtered count
+    document.getElementById('repo-count').textContent = `${filteredProjects.length} of ${projects.length}`;
 }
 
 // Scroll animations
